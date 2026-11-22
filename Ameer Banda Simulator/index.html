@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ameer Banda Simulator · Mean vs Median · Dr Chirag Joshi</title>
+<style>
+  :root{--navy:#0B1F3A;--or:#FF9933;--off:#F5F1E8;--gr:#1E9E5A;--red:#E04848;--grey:#8A90A0}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--navy);color:var(--off)}
+  .wrap{max-width:560px;margin:0 auto;padding:18px 16px 40px}
+  h1{font-size:1.55rem;margin:.2em 0 .1em;line-height:1.25}
+  h1 span{color:var(--or)}
+  .sub{color:#c9cfdb;margin:0 0 14px;font-size:.98rem}
+  .card{background:#fff;color:#1a1d29;border-radius:18px;padding:16px;margin:14px 0;box-shadow:0 6px 20px rgba(0,0,0,.25)}
+  .row{display:flex;gap:8px;align-items:flex-end;justify-content:space-between;min-height:190px;padding:6px 2px 0}
+  .p{flex:1;display:flex;flex-direction:column;align-items:center;font-size:.8rem;color:#555;position:relative}
+  .bar{width:70%;border-radius:8px 8px 0 0;background:#B8BFCC;transition:height .35s ease}
+  .p.mid .bar{background:var(--gr)}
+  .p.rich .bar{background:var(--or)}
+  .val{font-weight:700;color:#1a1d29;margin-top:4px;font-size:.95rem}
+  .tag{font-size:.7rem;margin-top:2px;min-height:1em;font-weight:700}
+  .p.mid .tag{color:var(--gr)} .p.rich .tag{color:var(--or)}
+  .stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+  .stat{border-radius:14px;padding:10px;text-align:center}
+  .stat b{display:block;font-size:1.9rem;line-height:1.1}
+  .stat small{font-weight:700;letter-spacing:.5px}
+  .mean{background:#FDECEC;color:var(--red)} .median{background:#E6F5EC;color:var(--gr)}
+  label{font-weight:700;display:block;margin:6px 0}
+  input[type=range]{width:100%;accent-color:var(--or)}
+  .btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+  button{border:0;border-radius:12px;padding:10px 14px;font-weight:700;font-size:.95rem;cursor:pointer}
+  .b1{background:var(--or);color:#1a1d29} .b2{background:#E8EBF1;color:#1a1d29}
+  .msg{margin-top:10px;font-size:.98rem;line-height:1.45;background:#FFF6EA;border-left:5px solid var(--or);padding:10px 12px;border-radius:8px}
+  .quiz input{width:100%;padding:10px;border-radius:10px;border:2px solid #d5d9e2;font-size:1rem}
+  .ok{color:var(--gr);font-weight:700} .no{color:var(--red);font-weight:700}
+  .edit{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:8px}
+  .edit input{width:100%;padding:6px;border-radius:8px;border:1px solid #d5d9e2;text-align:center;font-size:.9rem}
+  footer{text-align:center;color:#c9cfdb;font-size:.85rem;margin-top:22px;line-height:1.6}
+  footer a{color:var(--or);font-weight:700;text-decoration:none}
+  .unit{color:#777;font-size:.8rem;text-align:center;margin-top:4px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Ameer Banda Simulator <span>🏠</span></h1>
+  <p class="sub">Mohalle mein ek ameer banda aa gaya… toh <b>average</b> ka kya hoga, aur <b>median</b> ka? Khud try kijiye 👇</p>
+
+  <div class="card">
+    <div class="row" id="row"></div>
+    <div class="unit">Income (hazaar ₹ mahina) · bars ka size income ke hisaab se</div>
+    <div class="stats">
+      <div class="stat mean"><small>MEAN (average)</small><b id="mean">0</b></div>
+      <div class="stat median"><small>MEDIAN (beech wala)</small><b id="median">0</b></div>
+    </div>
+    <div class="msg" id="msg"></div>
+  </div>
+
+  <div class="card">
+    <label for="rich">Ameer bande ki income: <span id="richv">1000</span> hazaar</label>
+    <input type="range" id="rich" min="20" max="5000" step="10" value="1000">
+    <div class="btns">
+      <button class="b1" id="toggle">Ameer banda hatao</button>
+      <button class="b2" id="reset">Reset</button>
+    </div>
+    <label style="margin-top:12px">Baaki 4 dost ki income badliye (hazaar mein):</label>
+    <div class="edit" id="edit"></div>
+  </div>
+
+  <div class="card quiz">
+    <label for="ans">Reel ka sawaal: 10, 12, 15, 18 aur ameer banda 1000. <br>Median kitna?</label>
+    <input id="ans" inputmode="decimal" placeholder="Apna jawab likhiye…">
+    <div class="btns"><button class="b1" id="check">Check karo</button></div>
+    <p id="res"></p>
+  </div>
+
+  <div class="card">
+    <b>Yaad rakhne ki trick 🧠</b>
+    <p style="margin:.4em 0 0;line-height:1.5">
+      <b>Mean</b> = sabko jodo ÷ ginti → ek bada number (outlier) isko kheench leta hai.<br>
+      <b>Median</b> = sabko line mein lagao, beech wala → outlier se fark nahi padta.<br>
+      <b>Interview:</b> ghar ke daam, salary jaise data mein <b>median</b> zyada sach bolta hai.
+    </p>
+  </div>
+
+  <footer>
+    Banaya: <b>Dr Chirag Joshi</b> · Data Science, ML, DL &amp; Stats in Hindi<br>
+    Aise aur concepts ke liye follow kijiye <a href="https://www.instagram.com/chirag.professor/" target="_blank" rel="noopener">@chirag.professor</a><br>
+    <span style="font-size:.78rem;color:#9aa3b5">Seekhne ke liye bana hai · numbers sirf example hain</span>
+  </footer>
+</div>
+<script>
+  const base=[10,12,15,18];
+  let friends=[...base], richOn=true, rich=1000;
+  const $=id=>document.getElementById(id);
+  const fmt=x=>Number.isInteger(x)?x.toString():x.toFixed(1);
+  function median(a){const s=[...a].sort((x,y)=>x-y),n=s.length;return n%2?s[(n-1)/2]:(s[n/2-1]+s[n/2])/2}
+  function buildEdit(){
+    $("edit").innerHTML="";
+    friends.forEach((v,i)=>{const inp=document.createElement("input");inp.type="number";inp.min=0;inp.value=v;
+      inp.oninput=()=>{const x=parseFloat(inp.value);friends[i]=isNaN(x)||x<0?0:x;render()};$("edit").appendChild(inp)})
+  }
+  function render(){
+    const people=friends.map((v,i)=>({v,name:"Dost "+(i+1),rich:false}));
+    if(richOn) people.push({v:rich,name:"Ameer",rich:true});
+    const vals=people.map(p=>p.v), mean=vals.reduce((a,b)=>a+b,0)/vals.length, med=median(vals);
+    const sorted=[...people].sort((a,b)=>a.v-b.v), n=sorted.length;
+    const midIdx=n%2?[(n-1)/2]:[n/2-1,n/2];
+    const max=Math.max(...vals,1);
+    $("row").innerHTML=sorted.map((p,i)=>{
+      const h=Math.max(6,Math.round(160*Math.sqrt(p.v/max)));
+      const cls=(p.rich?" rich":"")+(midIdx.includes(i)?" mid":"");
+      const tag=p.rich?"AMEER":(midIdx.includes(i)?"BEECH WALA":"");
+      return `<div class="p${cls}"><div class="bar" style="height:${h}px"></div><div class="val">${fmt(p.v)}</div><div class="tag">${tag}</div></div>`}).join("");
+    $("mean").textContent=fmt(mean); $("median").textContent=fmt(med);
+    $("richv").textContent=rich; $("toggle").textContent=richOn?"Ameer banda hatao":"Ameer banda bulao";
+    const gap=mean/Math.max(med,0.0001);
+    $("msg").innerHTML = !richOn ? "Ameer banda gaya… dekhiye, <b>mean aur median paas-paas</b> aa gaye. Normal mohalla! 🙂"
+      : gap>3 ? `Ek ameer bande ki wajah se average <b>${fmt(mean)}</b> ho gaya, jabki beech wala insaan sirf <b>${fmt(med)}</b> kamata hai. <b>Kaagaz pe sab ameer, ghar wahi ke wahi!</b> 😄`
+      : gap>1.3 ? `Average thoda upar khinch gaya (<b>${fmt(mean)}</b>), median abhi bhi <b>${fmt(med)}</b>. Slider aur aage le jaiye 👉`
+      : "Abhi ameer banda zyada ameer nahi hai… slider aage le jaiye 👉";
+  }
+  $("rich").oninput=e=>{rich=parseInt(e.target.value);richOn=true;render()};
+  $("toggle").onclick=()=>{richOn=!richOn;render()};
+  $("reset").onclick=()=>{friends=[...base];rich=1000;richOn=true;$("rich").value=1000;buildEdit();render();$("res").textContent=""};
+  $("check").onclick=()=>{
+    const a=parseFloat($("ans").value.replace(/[^0-9.]/g,""));
+    if(isNaN(a)){$("res").innerHTML="Pehle ek number likhiye 🙂";return}
+    if(a===15) $("res").innerHTML='<span class="ok">✅ Sahi jawab: 15!</span> Line: 10, 12, <b>15</b>, 18, 1000 → beech wala 15. Mean? 211 😄 Ab reel pe comment karke batayiye!';
+    else if(Math.round(a)===211) $("res").innerHTML='<span class="no">❌ Yeh toh mean hai (211)!</span> Median ke liye sabko line mein lagaiye aur beech wala dekhiye.';
+    else $("res").innerHTML='<span class="no">❌ Thoda aur sochiye.</span> Hint: 5 log hain, toh beech wala 3rd number hoga.';
+  };
+  buildEdit(); render();
+</script>
+</body>
+</html>
